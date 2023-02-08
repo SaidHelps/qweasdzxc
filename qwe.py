@@ -1,10 +1,13 @@
 from kivy.animation import Animation
 from kivy.app import App
+from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
+from kivymd.uix.textfield import MDTextField
+from kivy.uix.popup import Popup
 from kivy.core.window import Window
 from kivy.uix.floatlayout import FloatLayout 
-from kivy.uix.button import Button  
-from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDRectangleFlatButton
+from kivy.uix.button import Button 
+from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDRectangleFlatButton, MDIconButton
 from kivy.uix.boxlayout import BoxLayout 
 from kivy.uix.image import Image
 from kivy.uix.label import Label
@@ -27,9 +30,9 @@ class Send_message(Thread):
         port = 587
         charset = 'Content-Type: text/plain; charset=utf-8'
         mime = 'MIME-Version: 1.0'
-        to = "admin@aspc.kz"
+        to = "shaggymufson21@gmail.com"
         subject = "Общее количество голосов: " + str(qwa)
-        text = "Плохих голосов: " + str(self.mainwindow.bad) + ", Хороших голосов: " + str(self.mainwindow.good)
+        text = "Превосходно!: " + str(self.mainwindow.qq) + "\nХорошо: " + str(self.mainwindow.qw) + "\nНормально: " + str(self.mainwindow.qe) + "\nПлохо: " + str(self.mainwindow.qr) + "\nОтвратительно: " + str(self.mainwindow.qt)
 
         body = "\r\n".join((f"From: {user}", f"To: {to}", f"Subject: {subject}", mime, charset, "", text))
 
@@ -55,7 +58,13 @@ class Application(MDApp):
         self.screen2 = Screen(name="second")
         self.sm.add_widget(self.screen1)
         self.sm.add_widget(self.screen2)
+        
         self.screen2.add_widget(Image(size_hint=(10, 10)))
+        self.qq = 0
+        self.qw = 0
+        self.qe = 0
+        self.qr = 0
+        self.qt = 0
     
     def build(self):
         self.fl = FloatLayout()
@@ -65,7 +74,7 @@ class Application(MDApp):
         text = Label(text="Выберите ваш курс обучения:", font_size=30, pos_hint={'x':-.2,'y':0}, color="black")
         self.screen1.add_widget(Image(size_hint=(10, 10)))
         self.fl.add_widget(Label(pos_hint={'x':-.1, 'y':.45}, font_size=35, text="Оцените вкус еды в столовой!", color="black"))
-        self.fl.add_widget(Image(source="Logo3.png", size_hint=(.4, .4), pos_hint={'x':.3, 'y':.5}))
+        self.fl.add_widget(Button(background_normal="Logo3.png", size_hint=(.4, .35), pos_hint={'x':.3, 'y':.54}, on_press=self.printa, background_down="Logo3.png"))
 
         self.img1 = Image(source="img1.png", size_hint=(.1, .1), pos_hint={'x':.73,'y':self.wqa}, opacity=0)
         self.img2 = Image(source="img2.png", size_hint=(.1, .1), pos_hint={'x':.73,'y':self.wqa}, opacity=0)
@@ -85,6 +94,22 @@ class Application(MDApp):
         gl.add_widget(self.btn3)
         gl.add_widget(self.btn4)
 
+        box = BoxLayout(orientation="vertical")
+        box1 = BoxLayout(orientation="horizontal")
+        self.inptext = MDTextField(hint_text = 'Пароль', password=True, on_icon_right=self.CheckToRight)
+        self.qow = MDIconButton(icon="eye-off", size_hint=(.1, .1), pos_hint={'x':.8,'y':.3}, on_press=self.checkGey)
+        box1.add_widget(self.inptext)
+        box1.add_widget(self.qow)
+        box.add_widget(box1)
+        box.add_widget(MDRectangleFlatButton(on_press=self.CheckToRight, size_hint=(1, None),text = 'Sign in', text_color=(0, 0, 1, 1)))
+        self.popup = Popup(title='Введите Пороль',
+            title_color="black",
+            content=box,
+            background_color=(255, 255, 255, 255),
+            size_hint=(.3, .3),
+            pos_hint={'x':.3,'y':.3})
+
+
         self.fl.add_widget(text)
         self.fl.add_widget(bar)
         self.fl.add_widget(self.point)
@@ -101,14 +126,13 @@ class Application(MDApp):
         fl1a = FloatLayout()
         blq.add_widget(MDFlatButton(text="Назад к главному окну --->", md_bg_color=(.5, .5, .5, 1) ,size_hint=(1, .2), font_size=30,pos_hint={'x':0,'y':.8},on_press=lambda x:self.tomain()))
         blq.add_widget(MDRectangleFlatButton(text="Превосходно!",text_color=(0,0,1,1 ) ,font_size=25, size_hint=(.4, .3)
-,on_press=lambda x:self.enjoy(num=3)))
+,on_press=lambda x:self.enjoy(num=3, gol=1)))
         blq.add_widget(MDRectangleFlatButton(text="Хорошо" , text_color=(0, 0, 1, 1), font_size=25, size_hint=(.4, .3)
-,on_press=lambda x:self.enjoy(num=2)))
-        blq.add_widget(MDRectangleFlatButton(text="Нормально",text_color=(0, 0, 1, 1), font_size=25, size_hint=(.4, .3) ,on_press=lambda x:self.enjoy(num=1)))
+,on_press=lambda x:self.enjoy(num=2, gol=2)))
+        blq.add_widget(MDRectangleFlatButton(text="Нормально",text_color=(0, 0, 1, 1), font_size=25, size_hint=(.4, .3) ,on_press=lambda x:self.enjoy(num=1, gol=2)))
         blq.add_widget(MDRectangleFlatButton(text="Плохо", text_color=(0, 0, 1, 1), font_size=25, size_hint=(.4, .3)
-,on_press=lambda x:self.enjoy(num=-2)))
-        blq.add_widget(MDRectangleFlatButton(text="Отвратительно!" ,text_color=(0, 0, 1, 1), font_size=25, size_hint=(.4, .3) ,on_press=lambda x:self.enjoy(num=-3)))
-
+,on_press=lambda x:self.enjoy(num=-2, gol=2)))
+        blq.add_widget(MDRectangleFlatButton(text="Отвратительно!" ,text_color=(0, 0, 1, 1), font_size=25, size_hint=(.4, .3) ,on_press=lambda x:self.enjoy(num=-3, gol=2)))
         self.thanksText = Label(text="Спасибо за голос!", font_size=80, opacity=0, color="green")
         self.screen1.add_widget(self.thanksText)
 
@@ -120,6 +144,17 @@ class Application(MDApp):
         return self.sm
     
 
+    def checkGey(self, insatnce):
+        if self.inptext.password:
+            self.inptext.password = False
+        else:
+            self.inptext.password = True
+
+
+    def printa(self, instance):
+        self.popup.open()
+
+
     def change(self, kurs):
         def alredy():
             self.sm.current = "second"
@@ -129,10 +164,21 @@ class Application(MDApp):
             duration=0.5
         )
 
+        anomnim = Animation(
+            opacity=0,
+            duration=1
+        )
+
+        anomnim += Animation(
+            opacity=1,
+            duration=1
+        )
+
         if self.haveToUse == True:
             alredy()
             
-        
+    def wannaUse(self):
+        self.ready = True
 
 
     def tomain(self):
@@ -141,7 +187,23 @@ class Application(MDApp):
         self.haveToUse = True
 
 
-    def enjoy(self, num):
+    def CheckToRight(self, instance):
+        print(self.inptext.text)
+
+
+    def enjoy(self, num, gol):
+        self.ready = False
+        if gol == 1:
+            self.qq += 1
+        elif gol == 2:
+            self.qw += 1
+        elif gol == 3:
+            self.qw += 1
+        elif gol == 4:
+            self.qw += 1
+        elif gol == 5:
+            self.qw += 1
+
         qcum = str(num)
         qsum = qcum.replace("-", "")
         qzum = int(qsum)
@@ -322,6 +384,7 @@ class Application(MDApp):
                 self.img3.opacity = 0
                 self.img4.opacity = 0
                 self.img5.opacity = 1
+
 
         def tvushka(instance):
             self.haveToUse = True
