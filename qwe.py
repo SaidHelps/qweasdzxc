@@ -47,7 +47,6 @@ class Application(MDApp):
     def __init__(self, **kwargs):
         super(Application, self).__init__(**kwargs)
         Window.celarcolor = (255, 255, 255, 255)
-        Config.write('myconfig.ini')
         self.all = 0
         self.haveToUse = True   
         self.bad = 0
