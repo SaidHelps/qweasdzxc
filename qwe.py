@@ -13,7 +13,6 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.gridlayout import GridLayout
-from kivy.config import Config
 import random
 from threading import Thread
 import smtplib
@@ -47,12 +46,17 @@ class Application(MDApp):
     def __init__(self, **kwargs):
         super(Application, self).__init__(**kwargs)
         Window.celarcolor = (255, 255, 255, 255)
-        self.all = 0
         self.haveToUse = True   
-        self.bad = 0
-        self.good = 0
         self.wq = .495
         self.wqa = .495 - .05
+        self.all = 0
+        self.bad = 0
+        self.good = 0
+        self.qq = 0
+        self.qw = 0
+        self.qe = 0
+        self.qr = 0
+        self.qt = 0
         self.smileState = 3
         self.sm = ScreenManager()
         self.screen1 = Screen(name="main")
@@ -63,11 +67,6 @@ class Application(MDApp):
         self.sm.add_widget(self.screen3)
 
         self.screen2.add_widget(Image(size_hint=(10, 10)))
-        self.qq = 0
-        self.qw = 0
-        self.qe = 0
-        self.qr = 0
-        self.qt = 0
         
         self.anonimUse = 0
     
@@ -150,9 +149,7 @@ class Application(MDApp):
         fl1a.add_widget(blq)
         self.screen2.add_widget(fl1a)
         
-
         return self.sm
-    
 
     def checkGey(self, insatnce):
         if self.inptext.password:
@@ -193,7 +190,7 @@ class Application(MDApp):
             
     def wannaUse(self):
         self.ready = True
-
+        
 
     def tomain(self):
         self.fl.opacity=1
@@ -228,13 +225,15 @@ class Application(MDApp):
     def ScreenAzam(self, dostup):
         def tomainq(instance):
             self.sm.current="main"
+            fl = FloatLayout()
+            fl.add_widget(Label(text=f"{self.a}"))
 
         def strange(instance):
             print(1)
 
         fl = FloatLayout()
         cubik = Button(size_hint=(.4, .4), text="круто")
-        fl.add_widget(cubik, on_press=strange)
+        fl.add_widget(cubik)
         fl.add_widget(Button(size_hint=(1, .1), pos_hint={'y':.9}, on_press=tomainq, text="Назад к Главному окну -->"))
 
         self.screen3.add_widget(fl)
@@ -485,6 +484,5 @@ class Application(MDApp):
         anom.on_complete=lor
         
         
-
 
 Application().run()
