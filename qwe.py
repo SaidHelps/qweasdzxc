@@ -4,7 +4,9 @@ from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
 from kivymd.uix.textfield import MDTextField
 from kivy.uix.popup import Popup
+from kivy.uix.progressbar import ProgressBar
 from kivy.core.window import Window
+from kivy.config import ConfigParser
 from kivy.uix.floatlayout import FloatLayout 
 from kivy.uix.button import Button 
 from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDRectangleFlatButton, MDIconButton
@@ -16,6 +18,8 @@ from kivy.uix.gridlayout import GridLayout
 import random
 from threading import Thread
 import smtplib
+import os 
+import ast
 
 class Send_message(Thread):
     def __init__(self, mainwindow, parent=None):
@@ -30,7 +34,7 @@ class Send_message(Thread):
         port = 587
         charset = 'Content-Type: text/plain; charset=utf-8'
         mime = 'MIME-Version: 1.0'
-        to = "shaggymufson21@gmail.com"
+        to = "admin"
         subject = "Общее количество голосов: " + str(qwa)
         text = "Превосходно!: " + str(self.mainwindow.qq) + "\nХорошо: " + str(self.mainwindow.qw) + "\nНормально: " + str(self.mainwindow.qe) + "\nПлохо: " + str(self.mainwindow.qr) + "\nОтвратительно: " + str(self.mainwindow.qt)
 
@@ -43,8 +47,33 @@ class Send_message(Thread):
         smtp.quit()
 
 class Application(MDApp):
+    def build_config(self, config):
+        config.adddefaultsection('General')
+        config.setdefault('General', 'p1', '0')
+        config.setdefault('General', 'p2', '0')
+        config.setdefault('General', 'p3', '0')
+        config.setdefault('General', 'p4', '0')
+        config.setdefault('General', 'p5', '0')
+
+    def set_value_from_config(self):
+        self.config.read(os.path.join(self.directory, '%(appname)s.ini'))
+        self.user_data = ast.literal_eval(self.config.get(
+            'General', 'p1'))
+        self.user_data = ast.literal_eval(self.config.get(
+            'General', 'p2'))
+        self.user_data = ast.literal_eval(self.config.get(
+            'General', 'p3'))
+        self.user_data = ast.literal_eval(self.config.get(
+            'General', 'p4'))
+        self.user_data = ast.literal_eval(self.config.get(
+            'General', 'p5'))
+
+    def get_application_config(self):
+        return super(Application, self).get_application_config(
+            '{}/%(appname)s.ini'.format(self.directory))
     def __init__(self, **kwargs):
         super(Application, self).__init__(**kwargs)
+        self.config = ConfigParser()
         Window.celarcolor = (255, 255, 255, 255)
         self.haveToUse = True   
         self.wq = .495
@@ -59,9 +88,11 @@ class Application(MDApp):
         self.qt = 0
         self.smileState = 3
         self.sm = ScreenManager()
+        self.bufferscreen = Screen(name="buffer")
         self.screen1 = Screen(name="main")
         self.screen2 = Screen(name="second")
         self.screen3 = Screen(name="admin")
+        self.sm.add_widget(self.bufferscreen)
         self.sm.add_widget(self.screen1)
         self.sm.add_widget(self.screen2)
         self.sm.add_widget(self.screen3)
@@ -71,6 +102,10 @@ class Application(MDApp):
         self.anonimUse = 0
     
     def build(self):
+        qpa = BoxLayout(orientation="vertical")
+        qpa.add_widget(Button(size_hint=(1, 1), on_press=self.qweMain))
+        self.bufferscreen.add_widget(qpa)
+
         self.fl = FloatLayout()
         bl = BoxLayout(orientation="horizontal", size_hint=(.4, .4))
         bar = Image(source="gradient.png", pos_hint={'x':.8,'y':.1}, size_hint=(.1, .8))
@@ -91,8 +126,7 @@ class Application(MDApp):
         self.btn1 = Button(text="1", font_size=30, on_press=lambda x:self.change(kurs=1), background_normal="statePass.png", color="black", background_disabled_down="stateDown.png", background_down="stateDown.png")
         self.btn2 = Button(text="2", font_size=30, on_press=lambda x:self.change(kurs=2), background_normal="statePass.png", color="black", background_disabled_down="stateDown.png", background_down="stateDown.png")
         self.btn3 = Button(text="3", font_size=30, on_press=lambda x:self.change(kurs=3), background_normal="statePass.png", color="black", background_disabled_down="stateDown.png", background_down="stateDown.png")
-        self.btn4 = Button(text="4", font_size=30, on_press=lambda x:self.change(kurs=4), background_normal="statePass.png", color="black", background_disabled_down="stateDown.png", background_down="stateDown.png")
-
+        self.btn4 = Button(text="Персонал колледжа", font_size=22, text_size=(110, 55),on_press=lambda x:self.change(kurs=4), background_normal="statePass.png", color="black", background_disabled_down="stateDown.png", background_down="stateDown.png")
         gl.add_widget(self.btn1)
         gl.add_widget(self.btn2)
         gl.add_widget(self.btn3)
@@ -100,14 +134,14 @@ class Application(MDApp):
 
         box = BoxLayout(orientation="vertical")
         box1 = BoxLayout(orientation="horizontal")
-        self.inptext = MDTextField(hint_text="Введите индивидуальный ключ", helper_text="За поролём к А.О.П", helper_text_mode="on_error")
+        self.inptext = MDTextField(hint_text="Введите индивидуальный ключ", helper_text="За поролём к А.О.П", helper_text_mode="on_error", on_text_validate=self.loginError, on_focus=self.loginError ,password=True)
         self.qow = MDIconButton(icon="eye-off", size_hint=(.1, .1), pos_hint={'x':.8,'y':.3}, on_press=self.checkGey)
         box1.add_widget(self.inptext)
         box1.add_widget(self.qow)
         box1.pos_hint={"y":.1}
         self.inptext.pos_hint={'y':.1}
         box.add_widget(box1)
-        box.add_widget(MDRectangleFlatButton(on_press=self.CheckToRight, size_hint=(1, None),text = 'Войти', text_color=(0, 0, 1, 1)))
+        box.add_widget(MDRectangleFlatButton(on_press=self.new_screen, size_hint=(1, None),text = 'Войти', text_color=(0, 0, 1, 1)))
         self.popup = Popup(title='Админ Контроль Панель',
             title_color="black",
             title_size=20,
@@ -151,19 +185,253 @@ class Application(MDApp):
         
         return self.sm
 
+
+    def loginError(self, instance):
+        self.inptext.error = True
+
+
     def checkGey(self, insatnce):
         if self.inptext.password:
             self.inptext.password = False
         else:
             self.inptext.password = True
+    
 
+    def qweMain(self, instance):
+        self.sm.current = "main"
+
+
+    def new_screen(self, btn):
+        box2 = BoxLayout(orientation='vertical')
+
+        self.lbzz = Label(text = '',
+        markup = True,
+        halign = 'center',
+        color = (0, 0, 0, 1),
+        size_hint = (1, 0.02))
+
+        self.lbz = Label(text = 'Рейтинг',
+        markup = True,
+        halign = 'center',
+        color = (0, 0, 0, 1),
+        size_hint = (1, 0.03), 
+        font_size = 30)
+
+        self.lbp1 = Label(text = "Отлично",
+        markup = True,
+        color = (0, 0, 0, 1),
+        halign = 'center',
+        size_hint = (1, 0.01))
+        self.p1 = ProgressBar(max = 10,
+        size_hint = (1, 0.01))
+        self.p1.value = 0
+        self.lbp2 = Label(text = "Хорошо",
+        markup = True,
+        color = (0, 0, 0, 1),
+        halign = 'center',
+        size_hint = (1, 0.01))
+        self.p2 = ProgressBar(max = 10,
+        size_hint = (1, 0.01))
+        self.lbp3 = Label(text = "Нормально",
+        markup = True,
+        color = (0, 0, 0, 1),
+        halign = 'center',
+        size_hint = (1, 0.01))
+        self.p3 = ProgressBar(max = 10,
+        size_hint = (1, 0.01))
+        self.lbp4 = Label(text = "Плохо", 
+        markup = True,
+        color = (0, 0, 0, 1),
+        halign = 'center',
+        size_hint = (1, 0.01))
+        self.p4 = ProgressBar(max = 10,
+        size_hint = (1, 0.01))
+        self.lbp5 = Label(text = "Отвратително", 
+        markup = True,
+        color = (0, 0, 0, 1),
+        halign = 'center',
+        size_hint = (1, 0.01))
+        self.p5 = ProgressBar(max = 10,
+        size_hint = (1, 0.01))
+
+
+
+
+        box2.add_widget(MDFlatButton(text="Назад к главному окну --->", md_bg_color=(.5, .5, .5, 1) ,size_hint=(1, .02), font_size=30,pos_hint={'x':0,'y':.8},on_press=self.on_leave))
+        box2.add_widget(self.lbzz)
+        box2.add_widget(self.lbz)
+        box2.add_widget(self.lbp1)
+        box2.add_widget(self.p1)
+        box2.add_widget(self.lbp2)
+        box2.add_widget(self.p2)
+        box2.add_widget(self.lbp3)
+        box2.add_widget(self.p3)
+        box2.add_widget(self.lbp4)
+        box2.add_widget(self.p4)
+        box2.add_widget(self.lbp5)
+        box2.add_widget(self.p5)
+
+        self.screen3.add_widget(box2)
+
+
+        d1 = ast.literal_eval(App.get_running_app().config.get('General', 'p1'))
+        d2 = ast.literal_eval(App.get_running_app().config.get('General', 'p2'))
+        d3 = ast.literal_eval(App.get_running_app().config.get('General', 'p3'))
+        d4 = ast.literal_eval(App.get_running_app().config.get('General', 'p4'))
+        d5 = ast.literal_eval(App.get_running_app().config.get('General', 'p5'))
+        
+
+        
+        self.p1.value = d1
+        ld = "Отлично " + str(d1)
+        self.lbp1.text = ld
+        if self.p1.value == 10:
+            self.p1.max = 100
+            self.p2.max = 100
+            self.p3.max = 100
+            self.p4.max = 100
+            self.p5.max = 100
+        elif self.p1.value == 100:
+            self.p1.max = 500
+            self.p2.max = 500
+            self.p3.max = 500
+            self.p4.max = 500
+            self.p5.max = 500
+        elif self.p1.value == 500:
+            self.p1.max = 1000
+            self.p2.max = 1000
+            self.p3.max = 1000
+            self.p4.max = 1000
+            self.p5.max = 1000
+        elif self.p1.value == 1000:
+            self.p1.max = 5000
+            self.p2.max = 5000
+            self.p3.max = 5000
+            self.p4.max = 5000
+            self.p5.max = 5000
+        self.p2.value = d2
+        ld2 = "Хорошо " + str(d2)
+        self.lbp2.text = ld2
+        if self.p2.value == 10:
+            self.p1.max = 100
+            self.p2.max = 100
+            self.p3.max = 100
+            self.p4.max = 100
+            self.p5.max = 100
+        elif self.p2.value == 100:
+            self.p1.max = 500
+            self.p2.max = 500
+            self.p3.max = 500
+            self.p4.max = 500
+            self.p5.max = 500
+        elif self.p2.value == 500:
+            self.p1.max = 1000
+            self.p2.max = 1000
+            self.p3.max = 1000
+            self.p4.max = 1000
+            self.p5.max = 1000
+        elif self.p2.value == 1000:
+            self.p1.max = 5000
+            self.p2.max = 5000
+            self.p3.max = 5000
+            self.p4.max = 5000
+            self.p5.max = 5000
+        self.p3.value = d3
+        ld3 = "Нормально " + str(d3)
+        self.lbp3.text = ld3
+        if self.p3.value == 10:
+            self.p1.max = 100
+            self.p2.max = 100
+            self.p3.max = 100
+            self.p4.max = 100
+            self.p5.max = 100
+        elif self.p3.value == 100:
+            self.p1.max = 500
+            self.p2.max = 500
+            self.p3.max = 500
+            self.p4.max = 500
+            self.p5.max = 500
+        elif self.p3.value == 500:
+            self.p1.max = 1000
+            self.p2.max = 1000
+            self.p3.max = 1000
+            self.p4.max = 1000
+            self.p5.max = 1000
+        elif self.p3.value == 1000:
+            self.p1.max = 5000
+            self.p2.max = 5000
+            self.p3.max = 5000
+            self.p4.max = 5000
+            self.p5.max = 5000
+        self.p4.value = d4
+        ld4 = "Плохо " + str(d4)
+        self.lbp4.text = ld4
+        if self.p4.value == 10:
+            self.p1.max = 100
+            self.p2.max = 100
+            self.p3.max = 100
+            self.p4.max = 100
+            self.p5.max = 100
+        elif self.p4.value == 100:
+            self.p1.max = 500
+            self.p2.max = 500
+            self.p3.max = 500
+            self.p4.max = 500
+            self.p5.max = 500
+        elif self.p4.value == 500:
+            self.p1.max = 1000
+            self.p2.max = 1000
+            self.p3.max = 1000
+            self.p4.max = 1000
+            self.p5.max = 1000
+        elif self.p1.value == 1000:
+            self.p1.max = 5000
+            self.p2.max = 5000
+            self.p3.max = 5000
+            self.p4.max = 5000
+            self.p5.max = 5000
+        self.p5.value = d5
+        ld5 = "Отвратително " + str(d5)
+        self.lbp5.text = ld5
+        if self.p5.value == 10:
+            self.p1.max = 100
+            self.p2.max = 100
+            self.p3.max = 100
+            self.p4.max = 100
+            self.p5.max = 100
+        elif self.p5.value == 100:
+            self.p1.max = 500
+            self.p2.max = 500
+            self.p3.max = 500
+            self.p4.max = 500
+            self.p5.max = 500
+        elif self.p5.value == 500:
+            self.p1.max = 1000
+            self.p2.max = 1000
+            self.p3.max = 1000
+            self.p4.max = 1000
+            self.p5.max = 1000
+        elif self.p5.value == 1000:
+            self.p1.max = 5000
+            self.p2.max = 5000
+            self.p3.max = 5000
+            self.p4.max = 5000
+            self.p5.max = 5000
+
+        if self.inptext.text == "123qweasdzxcghost":
+            self.sm.current = 'admin'
+            self.popup.dismiss()
+            self.inptext.text = ''
+            self.inptext.error = False
+        else:
+            self.inptext.error = True
+
+    def on_leave(self, btn): 
+        self.screen3.clear_widgets()
+        self.sm.current = "main"
 
     def printa(self, instance):
         self.popup.open()
-
-
-    def loginError(self, instance):
-            self.inptext.error=True    
     
 
     def change(self, kurs):
@@ -198,54 +466,6 @@ class Application(MDApp):
         self.haveToUse = True
 
 
-    def CheckToRight(self, instance):
-        def calback(dostupq):
-            self.ScreenAzam(dostup=dostupq)
-
-        if self.inptext.text == "":
-            self.anonimUse=0
-            self.inptext.error=False
-            self.popup.dismiss()
-            calback(dostupq=1)
-        if self.inptext.text == "1":
-            self.anonimUse=0
-            self.inptext.error=False
-            self.popup.dismiss()
-            calback(dostupq=2)
-        else:
-            if self.anonimUse == 5:
-                self.inptext.helper_text="Ты успокойся да уже 5 раз не правильно ввел!"
-                self.inptext.error=True
-                self.anonimUse = 0
-            else:
-                self.inptext.helper_text="За поролём к А.О.П"
-                self.inptext.error=True
-                self.anonimUse+=1
-
-    def ScreenAzam(self, dostup):
-        def tomainq(instance):
-            self.sm.current="main"
-            fl = FloatLayout()
-            fl.add_widget(Label(text=f"{self.a}"))
-
-        def strange(instance):
-            print(1)
-
-        fl = FloatLayout()
-        cubik = Button(size_hint=(.4, .4), text="круто")
-        fl.add_widget(cubik)
-        fl.add_widget(Button(size_hint=(1, .1), pos_hint={'y':.9}, on_press=tomainq, text="Назад к Главному окну -->"))
-
-        self.screen3.add_widget(fl)
-
-        if dostup == 1:
-            cubik.disabled = True
-        elif dostup == 2:
-            cubik.disabled = False
-
-        self.sm.current="admin"
-
-
     def enjoy(self, num, gol):
         self.ready = False
         if gol == 1:
@@ -253,11 +473,13 @@ class Application(MDApp):
         elif gol == 2:
             self.qw += 1
         elif gol == 3:
-            self.qw += 1
+            self.qe += 1
         elif gol == 4:
-            self.qw += 1
+            self.qr += 1
         elif gol == 5:
-            self.qw += 1
+            self.qt += 1
+
+        print(self.qq, self.qw, self.qe, self.qr, self.qt)
 
         qcum = str(num)
         qsum = qcum.replace("-", "")
@@ -402,6 +624,32 @@ class Application(MDApp):
             pos_hint={'x':.73,'y':self.wqa},
             duration=rand
         )
+
+        self.app = App.get_running_app()
+        self.app.user_data = ast.literal_eval(
+        self.app.config.get('General', 'p1'))
+        self.app.user_data = ast.literal_eval(
+        self.app.config.get('General', 'p2'))
+        self.app.user_data = ast.literal_eval(
+        self.app.config.get('General', 'p3'))
+        self.app.user_data = ast.literal_eval(
+        self.app.config.get('General', 'p4'))
+        self.app.user_data = ast.literal_eval(
+        self.app.config.get('General', 'p5'))
+
+
+
+        self.app.config.set('General', 'p1', self.qq )
+        self.app.config.write()
+        self.app.config.set('General', 'p2', self.qw)
+        self.app.config.write()
+        self.app.config.set('General', 'p3', self.qe)
+        self.app.config.write()
+        self.app.config.set('General', 'p4', self.qr)
+        self.app.config.write()
+        self.app.config.set('General', 'p5', self.qt)
+        self.app.config.write()
+
 
         def check():
             if self.wq < .190:
